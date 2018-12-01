@@ -29,5 +29,9 @@
     "presets": [
       "es2015"
     ]
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "underscore": "^1.9.1"
   }
 }

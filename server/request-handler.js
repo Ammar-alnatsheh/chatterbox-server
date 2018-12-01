@@ -26,16 +26,26 @@ var requestHandler = function(request, response) {
   
   if (method === 'POST' && url === '/classes/messages') {
     statusCode = 201;
-    var body = [];
-    request.on('data', (chunk) => {
-      console.log(chunk.toString());
-      body.push(chunk);
-    }).on('end', () => {
-      body = Buffer.concat(body);
+    
+    var body = '';
+    request.on('data', function (data) {
+      
+      body += data;
+      // Too much POST data, kill the connection!
+      // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+      if (body.length > 1e6) {
+        request.connection.destroy();
+      }
+          
     });
-    console.log(body);
-    storage.storage.setData(body);
-    output = JSON.stringify({'results': body});
+
+    request.on('end', function () {
+      var post = JSON.parse(body);
+      console.log(post);
+      storage.storage.setData(post);
+      output = JSON.stringify({'results': body});
+    });
+
   }
 
   response.writeHead(statusCode, headers);
