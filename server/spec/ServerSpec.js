@@ -102,5 +102,101 @@ describe('Node Server Request Listener Function', function() {
     expect(res._responseCode).to.equal(404);
     expect(res._ended).to.equal(true);
   });
+  
+
+
+
+  /////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////
+  // write 4 extra test by ammar and joe
+
+  it('Should 404 when given a nonexistent method/ written by ammar and joe', function() {
+    var req = new stubs.request('/classes/messages', 'SET');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(404);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should save all posted messages on the server/ written by ammar and joe', function() {
+    var stubMsg1 = {
+      username: 'Jono',
+      text: 'first message!'
+    };
+    var stubMsg2 = {
+      username: 'Jon',
+      text: 'second message!'
+    };
+
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length > 1).to.equal(true);
+    expect(res._ended).to.equal(true);
+  });
+
+
+  it('Should have unique IDs for each message/ written by ammar and joe', function() {
+    var stubMsg1 = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    // Now if we request the log for that room the message we posted should be there:
+    var stubMsg2 = {
+      username: 'Jon',
+      text: 'Do my'
+    };
+
+    req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    var messages = JSON.parse(res._data).results;
+    expect(messages[0].objectId).to.not.equal(messages[1].objectId);
+  });
+
+  it('Should add createdAt attribute to the message/ written by ammar and joe', function() {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(0);
+    expect(messages[0].createdAt).to.exist;
+    expect(res._ended).to.equal(true);
+  });
 
 });
