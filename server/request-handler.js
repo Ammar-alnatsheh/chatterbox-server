@@ -41,7 +41,6 @@ var requestHandler = function(request, response) {
 
     request.on('end', function () {
       var post = JSON.parse(body);
-      console.log(post);
       storage.storage.setData(post);
       output = JSON.stringify({'results': body});
     });
@@ -49,8 +48,7 @@ var requestHandler = function(request, response) {
   }
 
   response.writeHead(statusCode, headers);
-  response.write( output );
-  response.end();
+  response.end(output);
 };
 
 
