@@ -49,7 +49,8 @@ var requestHandler = function(request, response) {
   }
 
   response.writeHead(statusCode, headers);
-  response.end(output);
+  response.write( output );
+  response.end();
 };
 
 
