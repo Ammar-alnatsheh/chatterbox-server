@@ -22,18 +22,18 @@ var requestHandler = function(request, response) {
   if (method === 'GET' && url.includes('/classes/messages')) {
     statusCode = 200;
     output = JSON.stringify({'results': storage.storage.getData()});
-  }
-
-
-
-  if (method === 'OPTIONS') {
-    statusCode = 200;
-    output = JSON.stringify('hi');
-  }
-
+    response.writeHead(statusCode, headers);
+    response.end(output);
 
   
-  if (method === 'POST' && url.includes('/classes/messages')) {
+  } else if (method === 'OPTIONS') {
+    statusCode = 200;
+    response.writeHead(statusCode, headers);
+    response.end();
+
+
+  } else if (method === 'POST' && url.includes('/classes/messages')) {
+
     statusCode = 201;
     
     var body = '';
@@ -51,14 +51,17 @@ var requestHandler = function(request, response) {
     request.on('end', function () {
       var post = JSON.parse(body);
       storage.storage.setData(post);
-      output = JSON.stringify({'results': body});
+      output = JSON.stringify(body);
+      response.writeHead(statusCode, headers);
+      response.end(output);
     });
+
+  } else {
+    response.writeHead(statusCode, headers);
+    response.end(output);
 
   }
 
-
-  response.writeHead(statusCode, headers);
-  response.end(output);
 
 };
 
