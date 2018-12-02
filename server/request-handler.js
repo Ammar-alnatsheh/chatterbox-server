@@ -16,15 +16,24 @@ var requestHandler = function(request, response) {
   var output = 'The server can\'t handle the request.';
   var headers = defaultCorsHeaders;
 
+
   headers['Content-Type'] = 'application/json';
 
-  if (method === 'GET' && url === '/classes/messages') {
+  if (method === 'GET' && url.includes('/classes/messages')) {
     statusCode = 200;
     output = JSON.stringify({'results': storage.storage.getData()});
-
   }
+
+
+
+  if (method === 'OPTIONS') {
+    statusCode = 200;
+    output = JSON.stringify('hi');
+  }
+
+
   
-  if (method === 'POST' && url === '/classes/messages') {
+  if (method === 'POST' && url.includes('/classes/messages')) {
     statusCode = 201;
     
     var body = '';
@@ -47,8 +56,10 @@ var requestHandler = function(request, response) {
 
   }
 
+
   response.writeHead(statusCode, headers);
   response.end(output);
+
 };
 
 
